@@ -5,6 +5,8 @@ from threading import Semaphore
 class DialogFlowSampleApplication(Base.AbstractApplication):
     def main(self):
 
+
+
         # Set the correct language (and wait for it to be changed)
         self.langLock = Semaphore(0)
         self.setLanguage('en-US')
@@ -13,8 +15,8 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         print('1')
 
         # Pass the required Dialogflow parameters (add your Dialogflow parameters)
-        self.setDialogflowKey('nao-axsltp-05aa80c86129.json')
-        self.setDialogflowAgent('NAO')
+        self.setDialogflowKey('nao.json')
+        self.setDialogflowAgent('nao-wksstn')
         print('2')
 
         # Make the robot ask the question, and wait until it is done speaking
@@ -36,11 +38,12 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
 
         # Respond and wait for that to finish
         if self.name:
-            self.sayAnimated('Nice to meet you ' + self.name + '!')
+            self.sayAnimated('Nice to meet you ' + self.name + '!. Where do you come from?')
         else:
             self.sayAnimated('Sorry, I didn\'t catch your name.')
         self.speechLock.acquire()
         print('5')
+
         # Display a gesture (replace <gestureID> with your gestureID)
         # self.gestureLock = Semaphore(0)
         # self.doGesture('<gestureID>/behavior_1')
