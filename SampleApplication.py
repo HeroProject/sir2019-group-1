@@ -3,11 +3,130 @@ from threading import Semaphore
 import os, sys
 
 class DialogFlowSampleApplication(Base.AbstractApplication):
-    # def __init__(self):
-    #     # self.filename = ''
-    #     self.dir = 'Stories'
-    #     # if not os.path.isdir(self.dir):
-    #     #     os.mkdir(self.dir)
+
+
+    def make_questions(self):
+        self.answer_name = ''
+        self.get_age = ''
+        self.get_origin = ''
+
+        # set question, variable name and response
+        self.questions = {0: ['Hello, what is your name?', 'answer_name', 'Nice to meet you ' + self.answer_name + '!.'],
+                          2: ['Where do you come from', 'get_origin', 'Ah! I have heard of ' + self.get_origin + '.'],
+                          1: ['What is your age?', 'get_age', self.get_age + ' is a very nice age. I myself am a robot, I do not have an age']}
+
+    def question_loop(self):
+        self.make_questions()
+        for i in range(len(self.questions)):
+            question = self.questions[i][0]
+            variable = self.questions[i][1]
+            variableLock = variable + 'Lock'
+            response = self.questions[i][2]
+            while True:
+                self.sayAnimated(question)
+                self.speechLock.acquire()
+                print(i)
+
+                setattr(self, variableLock, Semaphore(0))
+
+                self.setAudioContext(variable)
+                self.startListening()
+                getattr(self, variableLock).acquire(timeout=5)
+                self.stopListening()
+                print('getatrrr ', getattr(self, variable))
+
+                if getattr(self, variable) is not '':
+                    print('break', getattr(self, variable))
+                    break
+                else:
+                    self.sayAnimated('Sorry, I didn\'t catch that.')
+
+
+            print(response)
+            self.sayAnimated(response)
+            self.speechLock.acquire()
+
+
+        # store story in stories
+        self.filename = self.answer_name
+        self.store_story()
+
+    def get_name(self):
+        self.answer_name = None
+        self.answer_nameLock = Semaphore(0)
+        self.setAudioContext('answer_name')
+        self.startListening()
+        self.answer_nameLock.acquire(timeout=5)
+        self.stopListening()
+        if not self.answer_name:  # wait one more second after stopListening (if needed)
+            self.answer_nameLock.acquire(timeout=1)
+
+        # Respond and wait for that to finish
+        if self.answer_name:
+            self.sayAnimated('Nice to meet you ' + self.answer_name + '!.')
+            self.filename = self.answer_name
+        else:
+            self.sayAnimated('Sorry, I didn\'t catch your name.')
+            sys.exit(1)
+
+        self.speechLock.acquire()
+        print('5')
+
+        # Display a gesture (replace <gestureID> with your gestureID)
+        # self.gestureLock = Semaphore(0)
+        # self.doGesture('<gestureID>/behavior_1')
+        # self.gestureLock.acquire()
+
+        # check where the person is from
+    def get_origin(self):
+        self.sayAnimated('So, I would like to know where you are from')
+        self.speechLock.acquire()
+        print('6')
+
+        # Listen for an answer for at most 5 seconds
+        self.get_origin = None
+        self.get_originLock = Semaphore(0)
+        self.setAudioContext('get_origin')
+        self.startListening()
+        self.get_originLock.acquire(timeout=5)
+        self.stopListening()
+        if not self.get_origin:  # wait one more second after stopListening (if needed)
+            self.get_originLock.acquire(timeout=1)
+
+        # Respond and wait for that to finish
+        if self.get_origin:
+            self.sayAnimated('Ah! I have heard of ' + self.get_origin + '.')
+        else:
+            self.sayAnimated('Sorry, I didn\'t catch that.')
+            sys.exit(1)
+
+        self.speechLock.acquire()
+        print('7')
+    def get_age(self):
+        # age
+        self.sayAnimated('How old are you?')
+        self.speechLock.acquire()
+        print('6')
+
+        # Listen for an answer for at most 5 seconds
+        self.get_age = None
+        self.get_ageLock = Semaphore(0)
+        self.setAudioContext('get_age')
+        self.startListening()
+        self.get_ageLock.acquire(timeout=5)
+        self.stopListening()
+        if not self.get_age:  # wait one more second after stopListening (if needed)
+            self.get_ageLock.acquire(timeout=1)
+
+        # Respond and wait for that to finish
+        if self.get_age:
+            self.sayAnimated(self.get_age + ' is a very nice age. I myself am a robot, I do not have an age')
+        else:
+            self.sayAnimated('Sorry, I didn\'t catch that')
+            sys.exit(1)
+
+        self.speechLock.acquire()
+        print('7')
 
 
     def main(self):
@@ -29,99 +148,25 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
 
         # Make the robot ask the question, and wait until it is done speaking
         self.speechLock = Semaphore(0)
+
+
+        # self.question_loop()
+        # return
+
         self.sayAnimated('Hello, what is your name?')
         self.speechLock.acquire()
         print('3')
 
-
-        # Listen for an answer for at most 5 seconds
-        self.name = None
-        self.nameLock = Semaphore(0)
-        self.setAudioContext('answer_name')
-        self.startListening()
-        self.nameLock.acquire(timeout=5)
-        self.stopListening()
-        if not self.name:  # wait one more second after stopListening (if needed)
-            self.nameLock.acquire(timeout=1)
-
-        # Respond and wait for that to finish
-        if self.name:
-            self.sayAnimated('Nice to meet you ' + self.name + '!.')
-            self.filename = self.name
-        else:
-            self.sayAnimated('Sorry, I didn\'t catch your name.')
-            sys.exit(1)
-
-        self.speechLock.acquire()
-        print('5')
-
-        # Display a gesture (replace <gestureID> with your gestureID)
-        # self.gestureLock = Semaphore(0)
-        # self.doGesture('<gestureID>/behavior_1')
-        # self.gestureLock.acquire()
-
-        # check where the person is from
-
-        self.sayAnimated('So, I would like to know where you are from')
-        self.speechLock.acquire()
-        print('6')
-
-        # Listen for an answer for at most 5 seconds
-        self.origin = None
-        self.originLock = Semaphore(0)
-        self.setAudioContext('get_origin')
-        self.startListening()
-        self.originLock.acquire(timeout=5)
-        self.stopListening()
-        if not self.origin:  # wait one more second after stopListening (if needed)
-            self.originLock.acquire(timeout=1)
-
-        # Respond and wait for that to finish
-        if self.origin:
-            self.sayAnimated('Ah! I have heard of ' + self.origin + '.')
-        else:
-            self.sayAnimated('Sorry, I didn\'t catch that.')
-            sys.exit(1)
-
-        self.speechLock.acquire()
-        print('7')
-
-        # age
-        self.sayAnimated('How old are you?')
-        self.speechLock.acquire()
-        print('6')
-
-        # Listen for an answer for at most 5 seconds
-        self.age = None
-        self.ageLock = Semaphore(0)
-        self.setAudioContext('get_age')
-        self.startListening()
-        self.ageLock.acquire(timeout=5)
-        self.stopListening()
-        if not self.age:  # wait one more second after stopListening (if needed)
-            self.ageLock.acquire(timeout=1)
-
-        # Respond and wait for that to finish
-        if self.age:
-            self.sayAnimated(self.age + ' is a very nice age. I myself am a robot, I do not have an age')
-        else:
-            self.sayAnimated('Sorry, I didn\'t catch that')
-            sys.exit(1)
-
-        self.speechLock.acquire()
-        print('7')
+        self.get_name()
+        self.get_age()
+        self.get_origin()
 
         self.store_story()
 
 
 
 
-
-
-
-
     def onRobotEvent(self, event):
-        print('onRobotEvent')
         if event == 'LanguageChanged':
             print('Language Changed')
             self.langLock.release()
@@ -133,31 +178,30 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             self.gestureLock.release()
 
     def onAudioIntent(self, *args, intentName):
-        print('onAudioIntent')
         print(intentName, *args)
         if intentName == 'answer_name' and len(args) > 0:
             print(args)
-            self.name = args[0]
-            self.nameLock.release()
+            self.answer_name = args[0]
+            self.answer_nameLock.release()
         if intentName == 'get_origin' and len(args) > 0:
             print(args)
-            self.origin = args[0]
-            self.originLock.release()
+            self.get_origin = args[0]
+            self.get_originLock.release()
         if intentName == 'get_age' and len(args) > 0:
             print(args)
             for arg in args:
                 if arg.isdigit():
-                    self.age = arg
-                    self.ageLock.release()
+                    self.get_age = arg
+                    self.get_ageLock.release()
 
     def store_story(self):
         filename = self.filename
         file_path = self.dir + '/' + self.filename + '.txt'
         file_path = self.check_path(file_path)
         with open(file_path, 'a') as f_out:
-            f_out.write('Name: ' + self.name + '\n')
-            f_out.write('Age: ' + self.age + '\n')
-            f_out.write('Country of origin: ' + self.origin + '\n')
+            f_out.write('Name: ' + self.answer_name + '\n')
+            f_out.write('Age: ' + self.get_age + '\n')
+            f_out.write('Country of origin: ' + self.get_origin + '\n')
         return
 
     def check_path(self, file_path):
