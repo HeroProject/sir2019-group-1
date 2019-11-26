@@ -1,0 +1,4 @@
+Name: Mike
+Age: 12
+Country of origin: Spain
+Exclusion: yes
