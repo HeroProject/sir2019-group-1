@@ -6,14 +6,14 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
 
 
     def make_questions(self):
-        self.answer_name = ''
-        self.get_age = ''
-        self.get_origin = ''
+        self.name = ''
+        self.age = ''
+        self.origin = ''
 
         # set question, variable name and response
-        self.questions = {0: ['Hello, what is your name?', 'answer_name', 'Nice to meet you ' + self.answer_name + '!.'],
-                          2: ['Where do you come from', 'get_origin', 'Ah! I have heard of ' + self.get_origin + '.'],
-                          1: ['What is your age?', 'get_age', self.get_age + ' is a very nice age. I myself am a robot, I do not have an age']}
+        self.questions = {0: ['Hello, what is your name?', 'name', 'Nice to meet you ' + self.name + '!.'],
+                          2: ['Where do you come from', 'get_origin', 'Ah! I have heard of ' + self.origin + '.'],
+                          1: ['What is your age?', 'get_age', self.age + ' is a very nice age. I myself am a robot, I do not have an age']}
 
     def question_loop(self):
         self.make_questions()
@@ -48,7 +48,7 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
 
 
         # store story in stories
-        self.filename = self.answer_name
+        self.filename = self.name
         self.store_story()
 
     def general(self):
@@ -69,28 +69,26 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         self.speechLock = Semaphore(0)
 
         # self.question_loop()
-        # return
 
     def get_name(self):
         # self.speechLock = Semaphore(0)
         self.sayAnimated('Hello, what is your name?')
         self.speechLock.acquire()
-        self.answer_name = None
-        self.answer_nameLock = Semaphore(0)
-        self.setAudioContext('answer_name')
+        self.name = None
+        self.nameLock = Semaphore(0)
+        self.setAudioContext('name')
         self.startListening()
-        self.answer_nameLock.acquire(timeout=5)
+        self.nameLock.acquire(timeout=5)
         self.stopListening()
-        # if not self.answer_name:  # wait one more second after stopListening (if needed)
-        #     self.answer_nameLock.acquire(timeout=1)
+        if not self.name:  # wait one more second after stopListening (if needed)
+            self.nameLock.acquire(timeout=1)
 
         # Respond and wait for that to finish
-        if self.answer_name:
-            self.sayAnimated('Nice to meet you ' + self.answer_name + '!.')
-            self.filename = self.answer_name
+        if self.name:
+            self.sayAnimated('Nice to meet you ' + self.name + '!.')
+            self.filename = self.name
         else:
             self.sayAnimated('Sorry, I didn\'t catch your name.')
-            self.speechLock.acquire()
             self.get_name()
 
         self.speechLock.acquire()
@@ -107,21 +105,20 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         self.speechLock.acquire()
 
         # Listen for an answer for at most 5 seconds
-        self.get_origin = None
-        self.get_originLock = Semaphore(0)
-        self.setAudioContext('get_origin')
+        self.origin = None
+        self.originLock = Semaphore(0)
+        self.setAudioContext('origin')
         self.startListening()
-        self.get_originLock.acquire(timeout=5)
+        self.originLock.acquire(timeout=5)
         self.stopListening()
-        if not self.get_origin:  # wait one more second after stopListening (if needed)
-            self.get_originLock.acquire(timeout=1)
+        if not self.origin:  # wait one more second after stopListening (if needed)
+            self.originLock.acquire(timeout=1)
 
         # Respond and wait for that to finish
-        if self.get_origin:
-            self.sayAnimated('Ah! I have heard of ' + self.get_origin + '.')
+        if self.origin:
+            self.sayAnimated('Ah! I have heard of ' + self.origin + '.')
         else:
             self.sayAnimated('Sorry, I didn\'t catch that.')
-            self.speechLock.acquire()
             self.get_origin()
 
         self.speechLock.acquire()
@@ -131,27 +128,26 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         self.speechLock.acquire()
 
         # Listen for an answer for at most 5 seconds
-        self.get_age = None
-        self.get_ageLock = Semaphore(0)
-        self.setAudioContext('get_age')
+        self.age = None
+        self.ageLock = Semaphore(0)
+        self.setAudioContext('age')
         self.startListening()
-        self.get_ageLock.acquire(timeout=5)
+        self.ageLock.acquire(timeout=5)
         self.stopListening()
-        if not self.get_age:  # wait one more second after stopListening (if needed)
-            self.get_ageLock.acquire(timeout=1)
+        if not self.age:  # wait one more second after stopListening (if needed)
+            self.ageLock.acquire(timeout=1)
 
         # Respond and wait for that to finish
-        if self.get_age:
-            self.sayAnimated(self.get_age + ' is a very nice age. I myself am a robot, I do not have an age')
+        if self.age:
+            self.sayAnimated(self.age + ' is a very nice age. I myself am a robot, I do not have an age')
         else:
             self.sayAnimated('Sorry, I didn\'t catch that')
-            self.speechLock.acquire()
             self.get_age()
 
         self.speechLock.acquire()
 
     def get_exclusion(self):
-        self.sayAnimated('Did you leave' + self.get_origin + 'because you fear prosecution based on race, religion, nationality, '
+        self.sayAnimated('Did you leave' + self.origin + 'because you fear prosecution based on race, religion, nationality, '
                          'political preference or because you belong to a particular social group?')
         self.speechLock.acquire()
 
@@ -170,13 +166,13 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             self.sayAnimated('Thank you')
         else:
             self.sayAnimated('Sorry, I didn\'t catch that')
+            self.get_exclusion()
 
         self.speechLock.acquire()
 
     def get_conflict(self):
-        self.speechLock = Semaphore(0)
         self.sayAnimated('Do you have legitimate reasons of becoming a victim of random violence by an armed '
-                         'conflict in ' + self.get_origin + '?')
+                         'conflict in ' + self.origin + '?')
         self.speechLock.acquire()
 
         # Listen for an answer for at most 5 seconds
@@ -194,12 +190,13 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             self.sayAnimated('Thank you')
         else:
             self.sayAnimated('Sorry, I didn\'t catch that')
+            self.get_conflict()
 
         self.speechLock.acquire()
 
     def get_inhumanity(self):
         self.sayAnimated('Do you have legitimate reasons to fear the death penalty or execution, '
-                         'torture or other inhumane or humiliating treatment in ' + self.get_origin + '?')
+                         'torture or other inhumane or humiliating treatment in ' + self.origin + '?')
         self.speechLock.acquire()
 
         # Listen for an answer for at most 5 seconds
@@ -217,6 +214,7 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             self.sayAnimated('Thank you')
         else:
             self.sayAnimated('Sorry, I didn\'t catch that')
+            self.get_inhumanity()
 
         self.speechLock.acquire()
 
@@ -239,6 +237,7 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             self.sayAnimated('Thank you')
         else:
             self.sayAnimated('Sorry, I didn\'t catch that')
+            self.get_family()
 
         self.speechLock.acquire()
 
@@ -261,6 +260,7 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             self.sayAnimated('Thank you')
         else:
             self.sayAnimated('Sorry, I didn\'t catch that')
+            self.get_reason()
 
         self.speechLock.acquire()
 
@@ -289,7 +289,6 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             print('Language Changed')
             self.langLock.release()
         elif event == 'TextDone':
-            print('Text Done')
             self.speechLock.release()
         elif event == 'GestureDone':
             print('Gesture Done')
@@ -297,20 +296,20 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
 
     def onAudioIntent(self, *args, intentName):
         print(intentName, *args)
-        if intentName == 'answer_name' and len(args) > 0:
+        if intentName == 'name' and len(args) > 0:
             print(args)
-            self.answer_name = args[0]
-            self.answer_nameLock.release()
-        if intentName == 'get_origin' and len(args) > 0:
+            self.name = args[0]
+            self.nameLock.release()
+        if intentName == 'origin' and len(args) > 0:
             print(args)
-            self.get_origin = args[0]
-            self.get_originLock.release()
-        if intentName == 'get_age' and len(args) > 0:
+            self.origin = args[0]
+            self.originLock.release()
+        if intentName == 'age' and len(args) > 0:
             print(args)
             for arg in args:
                 if arg.isdigit():
-                    self.get_age = arg
-                    self.get_ageLock.release()
+                    self.age = arg
+                    self.ageLock.release()
         if intentName == 'exclusion' and len(args) > 0:
             print(args)
             self.exclusion = args[0]
@@ -338,9 +337,9 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         file_path = self.dir + '/' + self.filename + '.txt'
         file_path = self.check_path(file_path)
         with open(file_path, 'a') as f_out:
-            f_out.write('Name: ' + self.answer_name + '\n')
-            f_out.write('Age: ' + self.get_age + '\n')
-            f_out.write('Country of origin: ' + self.get_origin + '\n')
+            f_out.write('Name: ' + self.name + '\n')
+            f_out.write('Age: ' + self.age + '\n')
+            f_out.write('Country of origin: ' + self.origin + '\n')
             f_out.write('Exclusion: ' + self.exclusion + '\n')
             f_out.write('Conflict: ' + self.conflict + '\n')
             f_out.write('Inhumanity: ' + self.inhumanity + '\n')
@@ -359,6 +358,5 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
 
 # Run the application
 sample = DialogFlowSampleApplication()
-
 sample.main()
 sample.stop()
