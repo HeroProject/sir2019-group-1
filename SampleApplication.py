@@ -86,12 +86,14 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         # Respond and wait for that to finish
         if self.name:
             self.sayAnimated('Nice to meet you ' + self.name + '!.')
+            self.speechLock.acquire()
             self.filename = self.name
         else:
             self.sayAnimated('Sorry, I didn\'t catch your name.')
+            self.speechLock.acquire()
             self.get_name()
 
-        self.speechLock.acquire()
+        # self.speechLock.acquire()
 
         # Display a gesture (replace <gestureID> with your gestureID)
         # self.gestureLock = Semaphore(0)
@@ -117,11 +119,13 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         # Respond and wait for that to finish
         if self.origin:
             self.sayAnimated('Ah! I have heard of ' + self.origin + '.')
+            self.speechLock.acquire()
         else:
             self.sayAnimated('Sorry, I didn\'t catch that.')
+            self.speechLock.acquire()
             self.get_origin()
 
-        self.speechLock.acquire()
+        # self.speechLock.acquire()
 
     def get_age(self):
         self.sayAnimated('How old are you?')
@@ -140,11 +144,13 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         # Respond and wait for that to finish
         if self.age:
             self.sayAnimated(self.age + ' is a very nice age. I myself am a robot, I do not have an age')
+            self.speechLock.acquire()
         else:
             self.sayAnimated('Sorry, I didn\'t catch that')
+            self.speechLock.acquire()
             self.get_age()
 
-        self.speechLock.acquire()
+        # self.speechLock.acquire()
 
     def get_exclusion(self):
         self.sayAnimated('Did you leave' + self.origin + 'because you fear prosecution based on race, religion, nationality, '
@@ -164,11 +170,13 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         # Respond and wait for that to finish
         if self.exclusion:
             self.sayAnimated('Thank you')
+            self.speechLock.acquire()
         else:
-            self.sayAnimated('Sorry, I didn\'t catch that')
+            self.sayAnimated('Sorry, could you please answer this question with, yes, or, no?')
+            self.speechLock.acquire()
             self.get_exclusion()
 
-        self.speechLock.acquire()
+        # self.speechLock.acquire()
 
     def get_conflict(self):
         self.sayAnimated('Do you have legitimate reasons of becoming a victim of random violence by an armed '
@@ -188,11 +196,12 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         # Respond and wait for that to finish
         if self.conflict:
             self.sayAnimated('Thank you')
+            self.speechLock.acquire()
         else:
-            self.sayAnimated('Sorry, I didn\'t catch that')
+            self.sayAnimated('Sorry, could you please answer this question with, yes, or, no?')
             self.get_conflict()
 
-        self.speechLock.acquire()
+        # self.speechLock.acquire()
 
     def get_inhumanity(self):
         self.sayAnimated('Do you have legitimate reasons to fear the death penalty or execution, '
@@ -212,11 +221,13 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         # Respond and wait for that to finish
         if self.inhumanity:
             self.sayAnimated('Thank you')
+            self.speechLock.acquire()
         else:
-            self.sayAnimated('Sorry, I didn\'t catch that')
+            self.sayAnimated('Sorry, could you please answer this question with, yes, or, no?')
+            self.speechLock.acquire()
             self.get_inhumanity()
 
-        self.speechLock.acquire()
+        # self.speechLock.acquire()
 
     def get_family(self):
         self.sayAnimated('Did your spouse, partner, father, mother or minor child recently receive a residence permit in the Netherlands?')
@@ -235,11 +246,13 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         # Respond and wait for that to finish
         if self.family:
             self.sayAnimated('Thank you')
+            self.speechLock.acquire()
         else:
-            self.sayAnimated('Sorry, I didn\'t catch that')
+            self.sayAnimated('Sorry, could you please answer this question with, yes, or, no?')
+            self.speechLock.acquire()
             self.get_family()
 
-        self.speechLock.acquire()
+        # self.speechLock.acquire()
 
     def get_reason(self):
         self.sayAnimated('Can you please explain why you want to ask for asylum?')
@@ -258,8 +271,10 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
         # Respond and wait for that to finish
         if self.reason:
             self.sayAnimated('Thank you')
+            self.speechLock.acquire()
         else:
             self.sayAnimated('Sorry, I didn\'t catch that')
+            self.speechLock.acquire()
             self.get_reason()
 
         self.speechLock.acquire()
