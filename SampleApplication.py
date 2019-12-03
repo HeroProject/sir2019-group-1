@@ -70,8 +70,13 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
 
         # self.question_loop()
 
+    def gesture(self, id):
+
+        self.gestureLock = Semaphore(0)
+        self.doGesture(id)
+        self.gestureLock.acquire()
+
     def get_name(self):
-        # self.speechLock = Semaphore(0)
         self.sayAnimated('Hello, what is your name?')
         self.speechLock.acquire()
         self.name = None
@@ -93,14 +98,6 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             self.speechLock.acquire()
             self.get_name()
 
-        # self.speechLock.acquire()
-
-        # Display a gesture (replace <gestureID> with your gestureID)
-        # self.gestureLock = Semaphore(0)
-        # self.doGesture('<gestureID>/behavior_1')
-        # self.gestureLock.acquire()
-
-        # check where the person is from
 
     def get_origin(self):
         self.sayAnimated('So, I would like to know where you are from')
@@ -125,7 +122,6 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             self.speechLock.acquire()
             self.get_origin()
 
-        # self.speechLock.acquire()
 
     def get_age(self):
         self.sayAnimated('How old are you?')
@@ -150,7 +146,6 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             self.speechLock.acquire()
             self.get_age()
 
-        # self.speechLock.acquire()
 
     def get_exclusion(self):
         self.sayAnimated('Did you leave' + self.origin + 'because you fear prosecution based on race, religion, nationality, '
@@ -277,22 +272,105 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             self.speechLock.acquire()
             self.get_reason()
 
+
+    def get_travel_route(self):
+        self.sayAnimated('Which country in Europe did you first arrive?')
         self.speechLock.acquire()
+
+        # Listen for an answer for at most 5 seconds
+        self.route = None
+        self.routeLock = Semaphore(0)
+        self.setAudioContext('route')
+        self.startListening()
+        self.routeLock.acquire(timeout=5)
+        self.stopListening()
+        if not self.route:  # wait one more second after stopListening (if needed)
+            self.routeLock.acquire(timeout=1)
+
+        # Respond and wait for that to finish
+        if self.route:
+            self.sayAnimated('Thank you')
+            self.speechLock.acquire()
+        else:
+            self.sayAnimated('Sorry, I didn\'t catch that')
+            self.speechLock.acquire()
+            self.get_travel_route()
+
+
+    def get_documentation(self):
+        self.sayAnimated('Are you in possession of proper documentation?')
+        self.speechLock.acquire()
+
+        # Listen for an answer for at most 5 seconds
+        self.documentation = None
+        self.documentationLock = Semaphore(0)
+        self.setAudioContext('yesno')
+        self.startListening()
+        self.documentationLock.acquire(timeout=5)
+        self.stopListening()
+        if not self.documentation:  # wait one more second after stopListening (if needed)
+            self.documentationLock.acquire(timeout=1)
+
+        # Respond and wait for that to finish
+        if self.documentation:
+            self.sayAnimated('Thank you')
+            self.speechLock.acquire()
+        else:
+            self.sayAnimated('Sorry, could you please answer this question with, yes, or, no?')
+            self.speechLock.acquire()
+            self.get_documentation()
+
+    def get_entrance(self):
+        self.sayAnimated('How did you get into The Netherlands?')
+        self.speechLock.acquire()
+
+        # Listen for an answer for at most 5 seconds
+        self.entrance = None
+        self.entranceLock = Semaphore(0)
+        self.setAudioContext('entrance')
+        self.startListening()
+        self.entranceLock.acquire(timeout=5)
+        self.stopListening()
+        if not self.entrance:  # wait one more second after stopListening (if needed)
+            self.entranceLock.acquire(timeout=1)
+
+        # Respond and wait for that to finish
+        if self.entrance:
+            self.sayAnimated('Thank you')
+            self.speechLock.acquire()
+        else:
+            self.sayAnimated('Sorry, I didn\'t catch that')
+            self.speechLock.acquire()
+            self.get_entrance()
 
     def main(self):
         self.general()
+        # self.gesture('animations/Sit/BodyTalk/BodyTalk_1')
+        self.get_travel_route()
+        print(len(self.route))
+        if self.route == 'The Netherlands':
+            print('same')
 
         self.get_name()
         self.get_age()
         self.get_origin()
+        self.get_travel_route()
+
+        if self.route is not 'The Netherlands':
+            self.sayAnimated('Sorry, your asylum application needs to be in' + self.route)
+            return  # send asylum seeker to self.route
+        self.get_entrance()
+        self.get_documentation()
+
+        self.sayAnimated('We would like to know why you came to The Netherlands. Can you please answer the following '
+                         'questions with yes, or, no?')
+
         self.get_exclusion()
         if self.exclusion == 'no':
             self.get_conflict()
         self.get_inhumanity()
         self.get_family()
-        self.get_reason()
-
-
+        # self.get_reason()
 
         self.store_story()
 
@@ -346,6 +424,18 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             print(args)
             self.reason = args[0]
             self.reasonLock.release()
+        if intentName == 'route' and len(args) > 0:
+            print(args)
+            self.route = args[0]
+            self.routeLock.release()
+        if intentName == 'entrance' and len(args) > 0:
+            print(args)
+            self.entrance = args[0]
+            self.entranceLock.release()
+        if intentName == 'yesno' and len(args) > 0:
+            print(args)
+            self.documentation = args[0]
+            self.documentationLock.release()
 
     def store_story(self):
         filename = self.filename
@@ -360,6 +450,9 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
             f_out.write('Inhumanity: ' + self.inhumanity + '\n')
             f_out.write('Family: ' + self.family + '\n')
             f_out.write('Reason: ' + self.reason + '\n')
+            f_out.write('Route: ' + self.route + '\n')
+            f_out.write('Entrance: ' + self.entrance + '\n')
+            f_out.write('Documentation: ' + self.documentation + '\n')
         return
 
     def check_path(self, file_path):
