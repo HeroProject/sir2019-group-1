@@ -1,3 +1,0 @@
-Name: Mike
-Age: 15
-Country of origin: Netherlands

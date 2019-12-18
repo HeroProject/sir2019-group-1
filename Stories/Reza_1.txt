@@ -1,0 +1,11 @@
+Name: Reza
+Age: 54
+Country of origin: Iran
+Company: alone
+First country of arrival: The Netherlands
+Entrance: train
+Documentation: yes
+Exclusion: no
+Conflict: yes
+Inhumanity: no
+Family with a permit: no

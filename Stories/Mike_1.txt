@@ -1,6 +1,0 @@
-Name: Mike
-Age: 100
-Country of origin: Spain
-Exclusion: yes
-Conflict: yes
-Inhumanity: no
